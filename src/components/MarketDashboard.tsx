@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TrendingUp, TrendingDown, AlertCircle, RefreshCw, ExternalLink, Newspaper, FileText } from "lucide-react";
+import { TrendingUp, TrendingDown, AlertCircle, RefreshCw, ExternalLink, Newspaper, FileText, Database } from "lucide-react";
 import { cn } from "@/src/lib/utils";
 
 interface MarketDashboardProps {
@@ -15,6 +15,7 @@ export function MarketDashboard({ data, onRefresh, loading }: MarketDashboardPro
   const signals = data?.signals || [];
   const news = data?.market_news || [];
   const cmfDocs = data?.cmf_docs || [];
+  const n8nAnalysis = data?.n8n_analysis || [];
 
   const topPerformers = [...allPrices]
     .sort((a, b) => parseFloat(b.variation) - parseFloat(a.variation))
@@ -237,6 +238,37 @@ export function MarketDashboard({ data, onRefresh, loading }: MarketDashboardPro
           </div>
         </div>
       </div>
+
+      {/* N8N Analysis Section */}
+      {n8nAnalysis.length > 0 && (
+        <div className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+          <div className="px-4 py-3 border-b border-slate-100 bg-blue-50/30 flex items-center gap-2">
+            <Database className="w-4 h-4 text-blue-600" />
+            <h3 className="font-semibold">Analyses Automatisées (N8N)</h3>
+            <span className="text-[10px] text-blue-500 font-bold ml-auto">DERNIÈRE SYNC: {data?.last_n8n_sync ? new Date(data.last_n8n_sync).toLocaleTimeString() : "N/A"}</span>
+          </div>
+          <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {n8nAnalysis.map((item: any, i: number) => (
+              <div key={i} className="p-4 bg-slate-50 border border-slate-100 rounded-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-2 opacity-10">
+                  <Database className="w-12 h-12" />
+                </div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded uppercase">{item.type}</span>
+                  <span className="text-[10px] text-slate-400">{new Date(item.date).toLocaleDateString()}</span>
+                </div>
+                <p className="text-sm text-slate-700 line-clamp-4 leading-relaxed">
+                  {item.content}
+                </p>
+                <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between items-center">
+                  <span className="text-[10px] text-slate-400 font-medium">Source: {item.source}</span>
+                  <button className="text-[10px] text-blue-600 font-bold hover:underline">Voir détails</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

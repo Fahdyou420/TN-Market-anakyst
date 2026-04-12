@@ -220,6 +220,30 @@ export default function App() {
             <div className="bg-white p-8 border border-slate-200 rounded-lg shadow-sm">
               <h3 className="text-xl font-bold mb-4">Configuration du Système</h3>
               <div className="space-y-6">
+                <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl">
+                  <div className="flex items-center gap-2 text-blue-700 font-bold text-sm mb-2">
+                    <Database className="w-4 h-4" />
+                    Intégration N8N & Automatisation
+                  </div>
+                  <p className="text-xs text-blue-600 mb-4">
+                    Utilisez ces endpoints dans vos workflows N8N pour automatiser le scraping quotidien et l'analyse IA.
+                  </p>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Scraping Quotidien (POST)</p>
+                      <code className="block p-2 bg-white border border-blue-200 rounded text-[10px] text-slate-700 break-all">
+                        {window.location.origin}/api/scrape/news
+                      </code>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Push Analyse N8N (POST)</p>
+                      <code className="block p-2 bg-white border border-blue-200 rounded text-[10px] text-slate-700 break-all">
+                        {window.location.origin}/api/n8n/analysis
+                      </code>
+                    </div>
+                  </div>
+                </div>
+
                 <div>
                   <h4 className="font-semibold text-sm text-slate-700 mb-2">Sources de Données</h4>
                   <div className="space-y-2">

@@ -61,7 +61,14 @@ async function startServer() {
       const data = await fs.readFile(DB_PATH, "utf-8");
       return JSON.parse(data);
     } catch {
-      return { bvmt_prices: [], signals: [], cmf_docs: [], market_news: [] };
+      return { 
+        bvmt_prices: [], 
+        signals: [], 
+        cmf_docs: [], 
+        market_news: [],
+        n8n_analysis: [],
+        last_n8n_sync: null
+      };
     }
   }
 
@@ -73,6 +80,44 @@ async function startServer() {
   app.get("/api/market/summary", async (req, res) => {
     const db = await getDB();
     res.json(db);
+  });
+
+  // N8N Integration Endpoints
+  app.post("/api/n8n/analysis", async (req, res) => {
+    try {
+      const { analysis, source, type } = req.body;
+      const db = await getDB();
+      
+      const newEntry = {
+        id: Date.now().toString(),
+        content: analysis,
+        source: source || "n8n",
+        type: type || "general",
+        date: new Date().toISOString()
+      };
+
+      db.n8n_analysis = [newEntry, ...(db.n8n_analysis || [])].slice(0, 50);
+      db.last_n8n_sync = new Date().toISOString();
+      
+      await saveDB(db);
+      res.json({ status: "success", entry: newEntry });
+    } catch (error: any) {
+      res.status(500).json({ status: "error", message: error.message });
+    }
+  });
+
+  app.get("/api/n8n/config", (req, res) => {
+    const baseUrl = process.env.APP_URL || `http://localhost:${PORT}`;
+    res.json({
+      endpoints: {
+        scrape_stocks: `${baseUrl}/api/scrape/bvmt`,
+        scrape_cmf: `${baseUrl}/api/scrape/cmf`,
+        scrape_news: `${baseUrl}/api/scrape/news`,
+        get_data: `${baseUrl}/api/market/summary`,
+        push_analysis: `${baseUrl}/api/n8n/analysis`
+      },
+      instructions: "Use these endpoints in n8n HTTP Request nodes to automate daily scraping and analysis."
+    });
   });
 
   const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
@@ -200,7 +245,8 @@ async function startServer() {
         "https://www.cmf.tn/?q=communiqu-s-des-opc",
         "https://www.cmf.tn/?q=bulletin-officiel",
         "https://www.cmf.tn/?q=valeurs-liquidatives-des-titres-opcvm",
-        "http://www.cmf.tn/fr/publications/communiques-du-cmf"
+        "https://www.cmf.tn/?q=avis-et-d-cisions-du-cmf",
+        "https://www.cmf.tn/?q=informations-des-soci-t-s"
       ];
       
       const allDocs: any[] = [];
