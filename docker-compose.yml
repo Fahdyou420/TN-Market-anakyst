@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: market-postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: market_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+
+  qdrant:
+    image: qdrant/qdrant
+    container_name: market-qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - ./data/qdrant:/qdrant/storage
+
+  n8n:
+    image: n8nio/n8n
+    container_name: market-n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+    volumes:
+      - ./n8n:/home/node/.n8n
+
+  ollama:
+    image: ollama/ollama
+    container_name: market-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama:/root/.ollama
+
+  bvmt-scraper:
+    build: ./scrapers/bvmt_scraper
+    container_name: bvmt-scraper
+    depends_on:
+      - postgres
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+
+  cmf-scraper:
+    build: ./scrapers/cmf_scraper
+    container_name: cmf-scraper
+    depends_on:
+      - postgres
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs

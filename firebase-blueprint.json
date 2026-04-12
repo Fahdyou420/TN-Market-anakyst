@@ -1,0 +1,85 @@
+{
+  "entities": {
+    "MarketPrice": {
+      "title": "Market Price",
+      "description": "Daily price data for a specific stock symbol.",
+      "type": "object",
+      "properties": {
+        "symbol": { "type": "string" },
+        "price": { "type": "number" },
+        "variation": { "type": "string" },
+        "segment": { "type": "string", "enum": ["STOCK", "FCP", "OBLIGATION"] },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["symbol", "price", "segment", "date"]
+    },
+    "PortfolioItem": {
+      "title": "Portfolio Item",
+      "description": "An asset owned by the user.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "symbol": { "type": "string" },
+        "quantity": { "type": "number" },
+        "buyPrice": { "type": "number" },
+        "buyDate": { "type": "string" },
+        "segment": { "type": "string" }
+      },
+      "required": ["uid", "symbol", "quantity", "buyPrice"]
+    },
+    "Signal": {
+      "title": "Market Signal",
+      "description": "Financial signal generated from market analysis.",
+      "type": "object",
+      "properties": {
+        "symbol": { "type": "string" },
+        "type": { "type": "string", "enum": ["BULLISH", "BEARISH"] },
+        "strength": { "type": "string", "enum": ["STRONG", "NORMAL"] },
+        "message": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["symbol", "type", "date"]
+    },
+    "CMFDocument": {
+      "title": "CMF Document",
+      "description": "A document or communique from the CMF.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "url": { "type": "string" },
+        "date": { "type": "string" },
+        "content": { "type": "string" }
+      },
+      "required": ["title", "url"]
+    },
+    "User": {
+      "title": "User Profile",
+      "description": "Private user information.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "user"] }
+      },
+      "required": ["uid", "email", "role"]
+    }
+  },
+  "firestore": {
+    "/bvmt_prices/{priceId}": {
+      "schema": "MarketPrice",
+      "description": "Collection of daily market prices."
+    },
+    "/signals/{signalId}": {
+      "schema": "Signal",
+      "description": "Collection of generated financial signals."
+    },
+    "/cmf_docs/{docId}": {
+      "schema": "CMFDocument",
+      "description": "Collection of CMF documents."
+    },
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Private user profiles."
+    }
+  }
+}

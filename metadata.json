@@ -1,0 +1,5 @@
+{
+  "name": "Tunisian Market Advisor AI",
+  "description": "A local AI-powered advisor for the Tunisian stock market (BVMT & CMF) featuring real-time scraping, financial signals, and RAG-based chat.",
+  "requestFramePermissions": []
+}
